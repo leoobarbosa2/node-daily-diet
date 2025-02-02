@@ -29,7 +29,7 @@ export async function mealsRoutes(app: FastifyInstance){
   })
 
   app.get('/', {
-    preHandler: [checkSessionIdExists],
+    preHandler: [checkSessionIdExists, checkUserAuthority],
   }, async(request, reply) => {
     const sessionScheme = zod.object({
       session_id: zod.string(),

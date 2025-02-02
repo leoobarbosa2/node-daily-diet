@@ -6,6 +6,7 @@ export async function checkUserExists(request: FastifyRequest, reply: FastifyRep
   const createUserScheme = zod.object({
     username: zod.string(),
   })
+
   const { username } = createUserScheme.parse(request.body)
 
   const userExists = (await knex('users')).find(user => user.username === username)

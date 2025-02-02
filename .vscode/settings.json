@@ -1,0 +1,11 @@
+{
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "always",
+    },
+    "eslint.enable": true,
+    "eslint.codeActionsOnSave.mode": "all",
+    "editor.letterSpacing": 2,
+    "editor.tabSize": 2,
+    "editor.fontLigatures": true
+}

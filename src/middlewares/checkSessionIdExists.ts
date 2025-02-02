@@ -1,5 +1,6 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
 import zod from 'zod'
+import { knex } from '../database'
 
 export async function checkSessionIdExists(request: FastifyRequest, reply: FastifyReply) {
   const sessionScheme = zod.object({
@@ -7,8 +8,15 @@ export async function checkSessionIdExists(request: FastifyRequest, reply: Fasti
   })
 
   const scheme = sessionScheme.safeParse(request.cookies)
+  const { data } = scheme
 
   if(scheme.error) {
     return reply.status(401).send({ error: { message: 'User not authorized' } })
+  }
+
+  const user = await knex('users').where('session_id', data?.session_id).first()
+
+  if (!user) {
+    return reply.status(401).send({ error: 'Unauthorized' })
   }
 }

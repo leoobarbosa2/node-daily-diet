@@ -4,7 +4,6 @@ import zod from 'zod'
 import { knex } from '../database'
 import { checkSessionIdExists } from '../middlewares/checkSessionIdExists'
 import { createMealsScheme } from '../schemes/meals'
-import { checkUserAuthority } from '../middlewares/checkUserAuthority'
 
 export async function mealsRoutes(app: FastifyInstance){
   app.post('/', {
@@ -29,7 +28,7 @@ export async function mealsRoutes(app: FastifyInstance){
   })
 
   app.get('/', {
-    preHandler: [checkSessionIdExists, checkUserAuthority],
+    preHandler: [checkSessionIdExists],
   }, async(request, reply) => {
     const sessionScheme = zod.object({
       session_id: zod.string(),
@@ -53,7 +52,7 @@ export async function mealsRoutes(app: FastifyInstance){
   })
 
   app.get('/:id', {
-    preHandler: [checkSessionIdExists, checkUserAuthority],
+    preHandler: [checkSessionIdExists],
   }, async (request, reply) => {
     const paramsScheme = zod.object({
       id: zod.string(),
@@ -61,23 +60,17 @@ export async function mealsRoutes(app: FastifyInstance){
 
     const { id } = paramsScheme.parse(request.params)
 
-    const meal = (await knex.select(
-      'id',
-      'name',
-      'description',
-      'is_diet',
-      'created_at',
-      'updated_at',
-    )
-      .first()
-      .from('meals')
-      .where('id', id))
+    const meal = await knex('meals').where('id', id).first()
+
+    if(!meal) {
+      return reply.status(404).send({ error: { message: 'Meal not found' } })
+    }
 
     return reply.status(200).send({ meal })
   })
 
   app.put('/:id', {
-    preHandler: [checkSessionIdExists, checkUserAuthority],
+    preHandler: [checkSessionIdExists],
   }, async (request, reply) => {
     const paramsScheme = zod.object({
       id: zod.string(),
@@ -85,6 +78,12 @@ export async function mealsRoutes(app: FastifyInstance){
 
     const { name, description, is_diet, created_at } = createMealsScheme.parse(request.body)
     const { id } = paramsScheme.parse(request.params)
+
+    const meal = await knex('meals').where('id', id).first()
+
+    if(!meal) {
+      return reply.status(400).send({ error: { message: 'Meal not found' } })
+    }
 
     await knex('meals').update({
       name,
@@ -140,7 +139,7 @@ export async function mealsRoutes(app: FastifyInstance){
   })
 
   app.delete('/:id', {
-    preHandler: [checkSessionIdExists, checkUserAuthority],
+    preHandler: [checkSessionIdExists],
   }, async (request, reply) => {
     const paramsScheme = zod.object({
       id: zod.string(),
@@ -148,7 +147,13 @@ export async function mealsRoutes(app: FastifyInstance){
 
     const { id } = paramsScheme.parse(request.params)
 
-    await knex('meals').where('id', id).del('*')
+    const meal = await knex('meals').where('id', id).first()
+
+    if(!meal) {
+      return reply.status(400).send({ error: { message: 'Meal not found' } })
+    }
+
+    await knex('meals').where('id', id).delete()
 
     return reply.status(204).send()
   })

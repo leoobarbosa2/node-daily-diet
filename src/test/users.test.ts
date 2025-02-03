@@ -24,4 +24,18 @@ describe('Users Routes', () => {
         username: 'testing',
       }).expect(201)
   })
+
+  it('should NOT be able to create a user with the same username', async () => {
+    await request(app.server)
+      .post('/users')
+      .send({
+        username: 'testing',
+      }).expect(201)
+
+    await request(app.server)
+      .post('/users')
+      .send({
+        username: 'testing',
+      }).expect(409)
+  })
 })

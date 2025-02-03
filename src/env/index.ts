@@ -1,7 +1,16 @@
-import 'dotenv/config'
+import { config } from 'dotenv'
 import zod from 'zod'
 
+if (process.env.NODE_ENV === 'test') {
+  config({
+    path: '.env.test',
+  })
+} else {
+  config()
+}
+
 const createEnvScheme = zod.object({
+  NODE_ENV: zod.enum(['production', 'test', 'development']).default('production'),
   PORT: zod.coerce.number().default(3333),
   DATABASE_URL: zod.string(),
   DATABASE_CLIENT: zod.enum(['sqlite3', 'pg']),

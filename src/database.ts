@@ -4,7 +4,7 @@ import { env } from './env'
 export const databaseConfig: Knex.Config = ({
   client: env.DATABASE_CLIENT,
   connection: {
-    filename: './database/app.db',
+    filename: env.DATABASE_URL,
   },
   useNullAsDefault: true,
   migrations: {

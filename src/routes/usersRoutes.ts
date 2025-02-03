@@ -15,7 +15,7 @@ export async function userRoutes(app: FastifyInstance) {
     if(!session_id) {
       session_id = crypto.randomUUID()
 
-      reply.cookie('session_id', crypto.randomUUID(), {
+      reply.cookie('session_id', session_id, {
         path: '/',
         maxAge: 60 * 60 * 24 * 7, // 7 days,
       })

@@ -111,7 +111,7 @@ export async function mealsRoutes(app: FastifyInstance){
       .where('session_id', session_id)
       .orderBy('created_at', 'desc')
 
-    const streakMetrics = allMeals.reduce(
+    const { bestOnDietSequence } = allMeals.reduce(
       (acc, meal) => {
         if (meal.is_diet) {
           acc.currentSequence += 1
@@ -133,7 +133,7 @@ export async function mealsRoutes(app: FastifyInstance){
         ...totalMeals,
         ...totalOnDiet,
         ...totalOutOfDiet,
-        ...streakMetrics,
+        bestOnDietSequence,
       },
     })
   })

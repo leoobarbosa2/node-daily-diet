@@ -11,7 +11,7 @@ export async function checkSessionIdExists(request: FastifyRequest, reply: Fasti
   const { data } = scheme
 
   if(scheme.error) {
-    return reply.status(401).send({ error: { message: 'User not authorized' } })
+    return reply.status(401).send({ error: { message: 'Session id not provided' } })
   }
 
   const user = await knex('users').where('session_id', data?.session_id).first()
